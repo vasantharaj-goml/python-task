@@ -22,7 +22,6 @@ SessionLocal = sessionmaker(
     expire_on_commit=False
 )
 
-
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
 
