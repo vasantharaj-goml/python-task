@@ -1,8 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
-from uuid import UUID
+from uuid import UUID, uuid4
 
-from pydantic import BaseModel
+from sqlalchemy import DateTime, Enum as SqlEnum, String, Text
+from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.core.database import Base
 
 
 class TicketStatus(str, Enum):
@@ -19,11 +23,58 @@ class TicketPriority(str, Enum):
     CRITICAL = "critical"
 
 
-class Ticket(BaseModel):
-    id: UUID
-    title: str
-    description: str | None = None
-    priority: TicketPriority
-    status: TicketStatus
-    created_at: datetime
-    updated_at: datetime
+def enum_values(enum_class):
+    return [item.value for item in enum_class]
+
+
+class Ticket(Base):
+    __tablename__ = "tickets"
+
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4
+    )
+
+    title: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    priority: Mapped[TicketPriority] = mapped_column(
+        SqlEnum(
+            TicketPriority,
+            name="ticket_priority",
+            values_callable=enum_values
+        ),
+        nullable=False,
+        default=TicketPriority.MEDIUM
+    )
+
+    status: Mapped[TicketStatus] = mapped_column(
+        SqlEnum(
+            TicketStatus,
+            name="ticket_status",
+            values_callable=enum_values
+        ),
+        nullable=False,
+        default=TicketStatus.OPEN
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc)
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc)
+    )

@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.ticket import TicketPriority, TicketStatus
 
@@ -50,6 +50,8 @@ class TicketResponse(BaseModel):
     status: TicketStatus
     created_at: datetime
     updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DeleteTicketResponse(BaseModel):
