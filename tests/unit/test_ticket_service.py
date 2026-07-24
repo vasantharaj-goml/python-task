@@ -71,4 +71,3 @@ def test_update_and_delete_ticket(service, db_session):
 def test_ticket_create_schema_rejects_short_title():
     with pytest.raises(ValidationError):
         TicketCreate(title="Hi", description="Invalid title")
-

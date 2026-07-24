@@ -1,7 +1,5 @@
 from uuid import uuid4
 
-from app.models.ticket import TicketPriority, TicketStatus
-
 
 def test_create_ticket_route_returns_created_ticket(client):
     response = client.post(
