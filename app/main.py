@@ -1,31 +1,33 @@
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 
 from app.api.ticket_routes import router as ticket_router
+from app.api.ai_routes import router as ai_router
 from app.core.config import settings
-from app.core.database import Base, engine
 
-# Importing the model registers the tickets table
-from app.models.ticket import Ticket  # noqa: F401
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    yield
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     debug=settings.debug,
-    description="Ticket CRUD API for AI Service Desk",
-    lifespan=lifespan
+    description="Ticket CRUD API for AI Service Desk"
 )
 
 
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 app.include_router(ticket_router)
+app.include_router(ai_router)
 
 
 @app.get("/", tags=["Root"])

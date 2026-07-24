@@ -1,13 +1,17 @@
 from app.schemas.ticket_schema import (
     DeleteTicketResponse,
+    SummarizeRequest,
+    SummarizeResponse,
     TicketCreate,
     TicketResponse,
-    TicketUpdate
+    TicketUpdate,
 )
 
 __all__ = [
     "TicketCreate",
     "TicketUpdate",
     "TicketResponse",
-    "DeleteTicketResponse"
+    "DeleteTicketResponse",
+    "SummarizeRequest",
+    "SummarizeResponse",
 ]
